@@ -163,21 +163,12 @@ public class DistanceMatrix
         int nSamples = _samples.Length;
         float[,] distmat = new float[nSamples, nSamples];
         
-        // for (int i = 0; i < nSamples; i++)
-        // {
-        // Parallel
         Parallel.For(0, nSamples, i => {
             for (int j = i+1; j < nSamples; j++)
             {
                 string[] a = _profiles[i];
                 string[] b = _profiles[j];
 
-                // orig
-                // int diffs = a.Zip(_profiles[j], (x, y) => (X : x, Y : y))
-                //     .Where(t => t.X != t.Y && t.X != "" && t.Y != "") // X and Y differ while neither is missing
-                //     .Count();
-
-                // nested_loop
                 int diffs = 0;
                 for (int k = 0; k < a.Length; k++)
                 {
@@ -187,8 +178,6 @@ public class DistanceMatrix
                 distmat[i, j] = diffs;
                 distmat[j, i] = diffs;
             }
-        // }
-        //Parallel
         });
         _distmat = distmat;
     }
