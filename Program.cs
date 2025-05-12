@@ -38,10 +38,10 @@ public class App
                 "normalized"
             );
 
-        var maxTreeHeightValue = new Option<int>(
+        var maxTreeHeightValue = new Option<float>(
             name: "--max-height",
             description: "Maximum tree height to allow before branch lengths are capped. 0 is unlimited",
-            getDefaultValue: () => 0
+            getDefaultValue: () => 0.0F
         );
 
         var upgma = new Command("upgma", "Cluster samples using UPGMA algorithm"){
@@ -53,7 +53,7 @@ public class App
 
         rootCommand.AddCommand(upgma);
 
-        upgma.SetHandler((string profile, string delimiter, string distanceMetric, int treeHeight) =>
+        upgma.SetHandler((string profile, string delimiter, string distanceMetric, float treeHeight) =>
             {
                 // Console.WriteLine($"profile={profile}, delim={delimiter}, distance={distanceMetric}");
                 DoUPGMA(profile, delimiter, distanceMetric, treeHeight); 
@@ -85,7 +85,7 @@ public class App
         return profile;
     }
 
-    private static void DoUPGMA(string profileFile, string delimiter, string distanceOption, int treeHeight){
+    private static void DoUPGMA(string profileFile, string delimiter, string distanceOption, float treeHeight){
         string full_distance = ParseDistance(distanceOption);
         Dictionary<string, List<string>> profile = ReadProfileFile(profileFile, delimiter);
         var output = DistanceMatrix.FromJson(profile, distance: full_distance, max_tree_height: treeHeight);

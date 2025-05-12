@@ -474,7 +474,7 @@ public class DistanceMatrix
         Dictionary<string, List<string>> json,
         string distance = "absolute_allele_differences",
         string algorithm = "upgma",
-        float max_tree_height = 200
+        float max_tree_height = 0
         )
     {
         DistanceMatrix dmat = new DistanceMatrix
