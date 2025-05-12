@@ -4,7 +4,7 @@
 
 
 
-public class Test
+public class App
 {
     public static void Main(string[] args)
     {
@@ -17,7 +17,7 @@ public class Test
         // string[] samples = output.Samples;
         // float[,] dmat = output.Distmat;
         // DistanceMatrix other = DistanceMatrix.FromDistanceMatrix(samples, dmat);
-        
+
         string tree = output.Tree;
         Console.WriteLine(tree);
 
