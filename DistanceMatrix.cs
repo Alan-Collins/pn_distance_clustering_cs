@@ -197,7 +197,7 @@ public class DistanceMatrix
                 int compared_loci = 0;
                 for (int k = 0; k < a.Length; k++)
                 {
-                    if (a[k] != "" && b[k] != "") continue;
+                    if (a[k] == "" || b[k] == "") continue;
                     compared_loci += 1;
                     if (a[k] != b[k]) diffs += 1;
                 }     
