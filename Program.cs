@@ -26,6 +26,24 @@ public class App
             description: "profile file"
         );
 
+        var noHeaderOption = new Option<bool>(
+            name: "--no-header",
+            description: "specify that your profile file has data in the first line",
+            getDefaultValue: () => false
+        );
+
+        var firstDataFieldOption = new Option<int>(
+            name: "--data-field",
+            description: "which column in your profile file the allele data begins (e.g., if some columns contain other metadata)",
+            getDefaultValue: () => 1
+        );
+
+        var sampleFieldOption = new Option<int>(
+            name: "--sample-field",
+            description: "which column in your profile file contains the sample names",
+            getDefaultValue: () => 0
+        );
+
         // upgma options
 
         var distanceOption = new Option<string>(
@@ -46,6 +64,9 @@ public class App
 
         var upgma = new Command("upgma", "Cluster samples using UPGMA algorithm"){
             delim,
+            noHeaderOption,
+            firstDataFieldOption,
+            sampleFieldOption,
             distanceOption,
             maxTreeHeightValue,
             profileFile
@@ -53,14 +74,14 @@ public class App
 
         rootCommand.AddCommand(upgma);
 
-        upgma.SetHandler((string profile, string delimiter, string distanceMetric, float treeHeight) =>
+        upgma.SetHandler((string profile, string delimiter, bool noHeader, int dataStart, int sampleField, string distanceMetric, float treeHeight) =>
             {
-                // Console.WriteLine($"profile={profile}, delim={delimiter}, distance={distanceMetric}");
-                DoUPGMA(profile, delimiter, distanceMetric, treeHeight); 
+                var alleleProfile = ReadProfileFile(profile, delimiter, sampleField, dataStart, noHeader);
+                string fullDistance = ParseDistance(distanceMetric);
+                DoUPGMA(alleleProfile, fullDistance, treeHeight); 
             },
-            profileFile, delim, distanceOption, maxTreeHeightValue
+            profileFile, delim, noHeaderOption,firstDataFieldOption, sampleFieldOption, distanceOption, maxTreeHeightValue
         );
-
 
         return await rootCommand.InvokeAsync(args);
     }
@@ -75,20 +96,19 @@ public class App
         }
     }
 
-    private static Dictionary<string, List<string>> ReadProfileFile(string filePath, string delim){
+    private static Dictionary<string, List<string>> ReadProfileFile(string filePath, string delim, int keyField, int dataStart, bool noHeader){
         List<string> lines = File.ReadLines(filePath).ToList();
+        if (!noHeader) {lines = lines[1..];}
         var profile = new Dictionary<string, List<string>>();
         foreach (var line in lines) {
             string[] fields = line.Split(delim);
-            profile.Add(fields[0], fields.ToList()[1..]);
+            profile.Add(fields[keyField], fields.ToList()[dataStart..]);
         }
         return profile;
     }
 
-    private static void DoUPGMA(string profileFile, string delimiter, string distanceOption, float treeHeight){
-        string full_distance = ParseDistance(distanceOption);
-        Dictionary<string, List<string>> profile = ReadProfileFile(profileFile, delimiter);
-        var output = DistanceMatrix.FromJson(profile, distance: full_distance, max_tree_height: treeHeight);
+    private static void DoUPGMA(Dictionary<string, List<string>> profile, string distanceMetric, float treeHeight){
+        var output = DistanceMatrix.FromJson(profile, distance: distanceMetric, max_tree_height: treeHeight);
         string tree = output.Tree;
         Console.WriteLine(tree);
     }
