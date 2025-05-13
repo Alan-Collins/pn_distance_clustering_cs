@@ -108,7 +108,7 @@ public class App
     }
 
     private static void DoUPGMA(Dictionary<string, List<string>> profile, string distanceMetric, float treeHeight){
-        var output = DistanceMatrix.FromJson(profile, distance: distanceMetric, max_tree_height: treeHeight);
+        var output = DistanceMatrix.FromJson(profile, distance: distanceMetric, max_tree_height: treeHeight, algorithm: "upgma");
         string tree = output.Tree;
         Console.WriteLine(tree);
     }
